@@ -1,0 +1,109 @@
+Number of rows and columns: (150, 5)
+
+Feature names: ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+
+Label column: species
+
+Data types of each column:
+sepal_length    float64
+sepal_width     float64
+petal_length    float64
+petal_width     float64
+species             str
+dtype: object
+
+First 5 rows:
+   sepal_length  sepal_width  petal_length  petal_width      species
+0           5.1          3.5           1.4          0.2  Iris-setosa
+1           4.9          3.0           1.4          0.2  Iris-setosa
+2           4.7          3.2           1.3          0.2  Iris-setosa
+3           4.6          3.1           1.5          0.2  Iris-setosa
+4           5.0          3.6           1.4          0.2  Iris-setosa
+
+--- Missing Values ---
+sepal_length    0
+sepal_width     0
+petal_length    0
+petal_width     0
+species         0
+dtype: int64
+
+--- Duplicate Rows ---
+Number of duplicates: 3
+
+--- Data Types ---
+sepal_length    float64
+sepal_width     float64
+petal_length    float64
+petal_width     float64
+species             str
+dtype: object
+
+--- Outliers (IQR Method) ---
+  sepal_length: 0 outlier(s)
+  sepal_width: 4 outlier(s)
+  petal_length: 0 outlier(s)
+  petal_width: 0 outlier(s)
+
+--- Handling Missing Values ---
+Missing values BEFORE fixing: 5
+Mean value used to fill: 5.82
+Missing values AFTER fixing: 0
+
+--- Label Encoding ---
+             species  species_label
+0        Iris-setosa              0
+50   Iris-versicolor              1
+100   Iris-virginica              2
+
+--- One-Hot Encoding ---
+   species_Iris-setosa  species_Iris-versicolor  species_Iris-virginica
+0                 True                    False                   False
+1                False                     True                   False
+2                False                    False                    True
+
+--- Normalization (Min-Max Scaling) ---
+First 5 rows after Normalization:
+   sepal_length  sepal_width  petal_length  petal_width
+0      0.222222     0.625000      0.067797     0.041667
+1      0.166667     0.416667      0.067797     0.041667
+2      0.111111     0.500000      0.050847     0.041667
+3      0.083333     0.458333      0.084746     0.041667
+4      0.194444     0.666667      0.067797     0.041667
+
+--- Standardization (Z-score Scaling) ---
+First 5 rows after Standardization:
+   sepal_length  sepal_width  petal_length  petal_width
+0     -0.900681     1.032057     -1.341272    -1.312977
+1     -1.143017    -0.124958     -1.341272    -1.312977
+2     -1.385353     0.337848     -1.398138    -1.312977
+3     -1.506521     0.106445     -1.284407    -1.312977
+4     -1.021849     1.263460     -1.341272    -1.312977
+
+--- Features (X) and Labels (y) ---
+Features (X) shape: (150, 4)
+Label (y) shape: (150,)
+
+Feature columns:
+['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+
+Label column: species
+Unique labels: <StringArray>
+['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']
+Length: 3, dtype: str
+
+First 5 rows of X:
+   sepal_length  sepal_width  petal_length  petal_width
+0           5.1          3.5           1.4          0.2
+1           4.9          3.0           1.4          0.2
+2           4.7          3.2           1.3          0.2
+3           4.6          3.1           1.5          0.2
+4           5.0          3.6           1.4          0.2
+
+First 5 rows of y:
+0    Iris-setosa
+1    Iris-setosa
+2    Iris-setosa
+3    Iris-setosa
+4    Iris-setosa
+Name: species, dtype: str
