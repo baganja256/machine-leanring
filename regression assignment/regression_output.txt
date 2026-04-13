@@ -1,0 +1,184 @@
+=== First 5 Rows ===
+      CRIM    ZN  INDUS  CHAS    NOX  ...  TAX  PTRATIO       B  LSTAT  MEDV
+0  0.00632  18.0   2.31   0.0  0.538  ...  296     15.3  396.90   4.98  24.0
+1  0.02731   0.0   7.07   0.0  0.469  ...  242     17.8  396.90   9.14  21.6
+2  0.02729   0.0   7.07   0.0  0.469  ...  242     17.8  392.83   4.03  34.7
+3  0.03237   0.0   2.18   0.0  0.458  ...  222     18.7  394.63   2.94  33.4
+4  0.06905   0.0   2.18   0.0  0.458  ...  222     18.7  396.90    NaN  36.2
+
+[5 rows x 14 columns]
+
+=== Shape (rows, columns) ===
+(506, 14)
+
+=== Feature Types ===
+CRIM       float64
+ZN         float64
+INDUS      float64
+CHAS       float64
+NOX        float64
+RM         float64
+AGE        float64
+DIS        float64
+RAD          int64
+TAX          int64
+PTRATIO    float64
+B          float64
+LSTAT      float64
+MEDV       float64
+dtype: object
+
+=== Missing Values ===
+CRIM       20
+ZN         20
+INDUS      20
+CHAS       20
+NOX         0
+RM          0
+AGE        20
+DIS         0
+RAD         0
+TAX         0
+PTRATIO     0
+B           0
+LSTAT      20
+MEDV        0
+dtype: int64
+
+=== Missing Values After Filling ===
+CRIM       0
+ZN         0
+INDUS      0
+CHAS       0
+NOX        0
+RM         0
+AGE        0
+DIS        0
+RAD        0
+TAX        0
+PTRATIO    0
+B          0
+LSTAT      0
+MEDV       0
+dtype: int64
+
+=== Standardized Data (first 5 rows) ===
+       CRIM        ZN     INDUS      CHAS  ...   PTRATIO         B     LSTAT  MEDV
+0 -0.405592  0.314369 -1.301706 -0.268391  ... -1.459000  0.441052 -1.096193  24.0
+1 -0.403140 -0.468160 -0.591052 -0.268391  ... -0.303094  0.441052 -0.502779  21.6
+2 -0.403142 -0.468160 -0.591052 -0.268391  ... -0.303094  0.396427 -1.231709  34.7
+3 -0.402549 -0.468160 -1.321115 -0.268391  ...  0.113032  0.416163 -1.387195  33.4
+4 -0.398265 -0.468160 -1.321115 -0.268391  ...  0.113032  0.441052 -0.176116  36.2
+
+[5 rows x 14 columns]
+=== Target Variable Statistics (MEDV) ===
+Mean:     22.53
+Median:   21.20
+Variance: 84.59
+Std Dev:  9.20
+Saved: histogram_medv.png
+Saved: scatter_plots.png
+Saved: correlation_matrix.png
+
+=== Correlations with MEDV ===
+MEDV       1.000000
+RM         0.695360
+ZN         0.362292
+B          0.333461
+DIS        0.249929
+CHAS       0.183844
+AGE       -0.377572
+RAD       -0.381626
+CRIM      -0.383895
+NOX       -0.427321
+TAX       -0.468536
+INDUS     -0.476394
+PTRATIO   -0.507787
+LSTAT     -0.723093
+Name: MEDV, dtype: float64
+
+=== Outliers in MEDV ===
+Number of outliers: 40
+=== New Features Added ===
+   ROOM_CRIME_RATIO  TAX_PER_ROOM  LSTAT_PTRATIO  LOG_CRIM
+0          6.533707     45.019011         76.194  0.006300
+1          6.250304     37.688834        162.692  0.026944
+2          6.994130     33.681280         71.734  0.026924
+3          6.778577     31.723350         54.978  0.031857
+4          6.685375     31.061984        213.741  0.066770
+
+=== Correlation of New Features with MEDV ===
+ROOM_CRIME_RATIO: 0.5474
+TAX_PER_ROOM: -0.5376
+LSTAT_PTRATIO: -0.7380
+LOG_CRIM: -0.4624
+Training set: 404 rows
+Testing set:  102 rows
+
+=== Prediction Comparison (first 10) ===
+Actual     Linear Reg      Decision Tree  
+23.6       26.88           25.00          
+32.4       36.09           32.00          
+13.6       14.98           18.90          
+22.8       25.20           21.70          
+16.1       17.30           15.20          
+20.0       22.27           28.10          
+17.8       17.33           19.30          
+14.0       13.88           17.30          
+19.6       22.19           21.70          
+16.8       19.56           21.20          
+
+=== Linear Regression ===
+RMSE: 4.1882
+MAE:  2.5310
+R²:   0.7608
+
+=== Decision Tree ===
+RMSE: 3.8707
+MAE:  2.9353
+R²:   0.7957
+
+Saved: residual_plots.png
+
+=== Cross-Validation R² Scores ===
+Linear Regression - Mean: 0.6519 | Std: 0.1620
+Decision Tree     - Mean: 0.1417 | Std: 0.8585
+
+=== Summary Table ===
+Model                RMSE       MAE        R²         CV Mean R²   CV Std    
+Linear Regression    4.1882     2.5310     0.7608     0.6519       0.1620    
+Decision Tree        3.8707     2.9353     0.7957     0.1417       0.8585    
+=== PART F: KEY FINDINGS ===
+
+SUMMARY OF PREPROCESSING & EDA:
+- Dataset: 506 rows, 14 features, target variable is MEDV (house price)
+- 6 features had missing values (20 each) — filled using median imputation
+- All features standardized using StandardScaler
+- House prices range roughly $5,000 to $50,000, mean $22,530
+- Distribution is slightly right-skewed with 40 outliers
+
+MOST IMPORTANT FEATURES:
+- LSTAT (-0.72): % lower-income population — strongest predictor of low prices
+- RM (0.70): number of rooms — strongest predictor of high prices  
+- PTRATIO (-0.51): pupil-teacher ratio — poor schools reduce house value
+- Engineered feature LSTAT_PTRATIO (-0.74) outperformed all original features
+
+MODEL COMPARISON:
+- On test set: Decision Tree had slightly better RMSE (3.87 vs 4.19)
+- Cross-validation reveals Decision Tree is overfitting (CV R²: 0.14, Std: 0.86)
+- Linear Regression is more stable and generalizes better (CV R²: 0.65, Std: 0.16)
+- WINNER: Linear Regression
+
+LIMITATIONS:
+- Dataset is from the 1970s — housing market has changed significantly
+- Only 506 rows — small dataset increases overfitting risk
+- Some features like CHAS (Charles River dummy) have very low variance
+
+SUGGESTED IMPROVEMENTS:
+1. Use Ridge or Lasso Regression to reduce overfitting with regularization
+2. Tune Decision Tree with max_depth parameter to prevent overfitting
+
+=== FINAL RESULTS TABLE ===
+Model                RMSE       MAE        R²         CV R² Mean±Std
+Linear Regression    4.1882     2.5310     0.7608     0.6519 ± 0.1620
+Decision Tree        3.8707     2.9353     0.7957     0.1417 ± 0.8585

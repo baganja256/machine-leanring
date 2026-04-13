@@ -1,0 +1,433 @@
+
+
+===== PAGE 1 =====
+CSC 62201: Fundamentals of Machine Learning
+ Week 5 Regression Assignment
+ Complete Explanation Guide — What the Code Does, Why, and What to Say in Class
+ Group 1: Boston Housing Price Prediction
+What This Assignment Is Actually About
+This assignment is a complete machine learning pipeline. That means you are not just writing code
+that works — you are going through every step a real data scientist goes through when trying to
+predict something using data. In your case, you are predicting house prices in Boston using 13
+features (things like crime rate, number of rooms, tax rate, etc.).
+The six parts of the assignment follow this logical order: get the data ready (Part A), understand what
+the data looks like (Part B), create better features from the existing ones (Part C), train two different
+models to make predictions (Part D), measure how good those predictions are (Part E), and finally
+explain what you found (Part F).
+You do not need to have memorized any of this. You need to understand what each step did and
+why. That is what this PDF covers.
+
+
+===== PAGE 2 =====
+PART A — Data Loading & Preprocessing (15 Marks)
+What is this part doing?
+Before you can train any model, you need clean, consistent data. This part loads the CSV file, checks
+what is in it, fixes any missing values, and scales the numbers so they are all on the same range.
+The Dataset
+The Boston Housing Dataset has 506 rows and 14 columns. Each row is one house. The column you
+are trying to predict is called MEDV — the median value of a house in thousands of dollars. The other
+13 columns are the features (the clues the model uses to predict the price).
+Column
+Full Name
+What it means
+CRIM
+Crime Rate
+Crime rate per capita in the neighbourhood
+ZN
+Zoning
+% of land zoned for large residential lots
+INDUS
+Industry
+% of land used for non-retail business
+CHAS
+Charles River
+1 if next to Charles River, 0 if not
+NOX
+Nitrogen Oxide
+Air pollution level
+RM
+Rooms
+Average number of rooms per house
+AGE
+Age
+% of houses built before 1940
+DIS
+Distance
+Distance to employment centres
+RAD
+Highway Access
+Accessibility to radial highways
+TAX
+Tax Rate
+Property tax rate
+PTRATIO
+Pupil-Teacher
+Pupils per teacher in schools nearby
+B
+Black population
+A demographic index
+LSTAT
+Lower Status
+% of population that is lower income
+MEDV
+House Value
+TARGET: Median house price in $1000s
+Missing Values — What was the problem and how did you fix it?
+When you ran the code, 6 columns had 20 missing values each: CRIM, ZN, INDUS, CHAS, AGE, and
+LSTAT. Missing values are a problem because machine learning models cannot handle blank entries
+— they will crash or give wrong results.
+The fix used was median imputation — replacing each missing value with the median of that column.
+The median is the middle value when all numbers are sorted. It was chosen over the mean (average)
+because housing data has outliers (a few extremely expensive or cheap houses), and the median is
+not affected by those extremes the way the mean is.
+In plain English: if the average number of rooms is 6.3 but one mansion has 20 rooms pulling the
+average up to 7.1, the median stays at 6.3. That is more honest.
+Standardization — Why did you scale the data?
+
+
+===== PAGE 3 =====
+Different columns have completely different scales. CRIM (crime rate) might be 0.006, while TAX (tax
+rate) might be 296. If you feed these raw numbers into a model, the model will think TAX is 50,000
+times more important than CRIM just because its numbers are bigger. That is wrong.
+StandardScaler fixes this by converting every column so that its mean becomes 0 and its standard
+deviation becomes 1. Now all features are on equal footing and the model can fairly compare them.
+Output from your code:
+Shape: (506, 14) — 506 houses, 14 columns including the target MEDV.
+6 features had 20 missing values each. After median fill: all zeros. Standardization applied to all
+features except MEDV.
+
+
+===== PAGE 4 =====
+PART B — Exploratory Data Analysis / EDA (20 Marks)
+What is EDA?
+EDA means exploring your data before modeling it. You are trying to understand: what does the
+target variable look like? Which features are most related to it? Are there any weird values or
+outliers? This part is worth the most marks (20) because understanding your data is the most
+important step.
+Target Variable Statistics
+Statistic
+Value
+What it means
+Mean
+22.53
+Average house price is $22,530
+Median
+21.20
+Middle house price is $21,200
+Variance
+84.59
+How spread out the prices are (high = wide spread)
+Std Deviation
+9.20
+Typical price is within $9,200 of the mean
+Outliers
+40
+40 houses have unusually high or low prices
+The mean (22.53) is higher than the median (21.20). This tells you the distribution is slightly
+right-skewed — meaning a few very expensive houses are pulling the average up. Most houses are
+clustered around $21,000 but a small number cost much more.
+Correlation — Which features predict house price?
+Correlation is a number between -1 and +1 that measures how strongly two things are related. +1
+means as one goes up, the other always goes up. -1 means as one goes up, the other always goes
+down. 0 means no relationship at all.
+Feature
+Correlation with MEDV
+Interpretation
+RM (rooms)
++0.70
+Strong positive — more rooms = higher price
+LSTAT (low income %)
+-0.72
+Strong negative — more poverty = lower price
+PTRATIO (pupils/teacher)
+-0.51
+Negative — worse schools = lower price
+INDUS (industry)
+-0.48
+Negative — more industry = lower price
+TAX (tax rate)
+-0.47
+Negative — higher tax = lower price
+NOX (pollution)
+-0.43
+Negative — more pollution = lower price
+CHAS (river)
++0.18
+Weak positive — river proximity slightly helps
+The plots saved in your folder:
+histogram_medv.png — shows the shape of house price distribution. You will see a right skew (tail on
+the right side).
+
+
+===== PAGE 5 =====
+scatter_plots.png — 4 scatter plots showing RM, LSTAT, PTRATIO and CRIM vs price. RM shows a
+clear upward line. LSTAT shows a clear downward curve.
+correlation_matrix.png — a heatmap where darker red means strong positive correlation and darker
+blue means strong negative. The MEDV column on the right shows which features matter most.
+Outliers
+40 houses were identified as outliers using the IQR method. IQR stands for Interquartile Range — the
+range between the 25th and 75th percentile of prices. Any house priced more than 1.5x the IQR
+above or below those boundaries is flagged as an outlier. Outliers can confuse the model by making it
+try to fit unusual cases at the expense of typical ones.
+
+
+===== PAGE 6 =====
+PART C — Feature Engineering (15 Marks)
+What is feature engineering?
+Feature engineering means creating new columns from the existing ones. The idea is that sometimes
+combining two features gives the model better information than either feature alone. You are not
+inventing data — you are repackaging the existing data in a smarter way.
+The 4 new features you created:
+New Feature
+Formula
+Correlation with MEDV
+Why it makes sense
+ROOM_CRIME_RATIO
+RM / (CRIM + 1)
++0.5474
+A house with many rooms in a safe area is more valuable than just counting rooms alone
+TAX_PER_ROOM
+TAX / RM
+-0.5376
+Tax burden per room — high tax with few rooms means expensive to live there
+LSTAT_PTRATIO
+LSTAT x PTRATIO
+-0.7380
+Combines poverty level with poor school quality — together they destroy house value more than either alone
+LOG_CRIM
+log(CRIM + 1)
+-0.4624
+Crime rate is extremely skewed — a few neighbourhoods have insane crime. Log brings it to a normal scale
+The most important result here: LSTAT_PTRATIO has a correlation of -0.74 with house price. That
+is stronger than any single original feature (LSTAT was -0.72, PTRATIO was -0.51). By combining
+them you created a better predictor than either one alone. That is the whole point of feature
+engineering.
+
+
+===== PAGE 7 =====
+PART D — Regression Modeling (25 Marks)
+What are you doing here?
+You are training two different machine learning models on the data and comparing their predictions.
+Both models learn from the training set (404 houses) and are then tested on the test set (102 houses
+they have never seen before). The 80/20 split means 80% of the data trains the model, 20% tests it.
+Model 1: Linear Regression
+Linear Regression assumes there is a straight-line relationship between the features and the target. It
+finds the best straight line through the data. Think of it as drawing a line of best fit through a scatter
+plot — the model learns the slope and position of that line from the training data, then uses it to
+predict prices for new houses.
+In plain terms: Linear Regression says 'each extra room adds X dollars to the price, each % of
+lower-income residents removes Y dollars' and combines all those effects into one prediction.
+Model 2: Decision Tree Regressor
+A Decision Tree works completely differently. It learns a series of if-then rules from the data. For
+example: IF rooms > 7 AND crime < 0.1 THEN price is around $35,000. It builds a tree of these rules
+by splitting the data at each step to reduce prediction error. It does not assume any straight line — it
+can capture complex, non-linear patterns.
+Prediction comparison (first 10 houses):
+Actual Price
+Linear Regression
+Decision Tree
+LR Error
+DT Error
+23.6
+26.88
+25.00
+3.28
+1.40
+32.4
+36.09
+32.00
+3.69
+0.40
+13.6
+14.98
+18.90
+1.38
+5.30
+22.8
+25.20
+21.70
+2.40
+1.10
+20.0
+22.27
+28.10
+2.27
+8.10
+17.8
+17.33
+19.30
+0.47
+1.50
+14.0
+13.88
+17.30
+0.12
+3.30
+Looking at just these predictions, both models are close. But the real test comes in Part E.
+
+
+===== PAGE 8 =====
+PART E — Model Evaluation & Error Analysis (15 Marks)
+The three metrics explained
+Metric
+Full Name
+What it measures
+Lower/Higher is better
+RMSE
+Root Mean Squared Error
+Average prediction error, penalises large mistakes more heavily
+Lower is better
+MAE
+Mean Absolute Error
+Average prediction error in raw units ($1000s)
+Lower is better
+R²
+R-Squared
+% of price variation the model explains. 1.0 = perfect, 0 = useless
+Higher is better
+Your actual results:
+Model
+RMSE
+MAE
+R²
+CV R² Mean
+CV Std Dev
+Linear Regression
+4.1882
+2.5310
+0.7608
+0.6519
+0.1620
+Decision Tree
+3.8707
+2.9353
+0.7957
+0.1417
+0.8585
+The most important finding — Overfitting
+This is the key insight of the entire assignment. On the test set alone, Decision Tree looks better:
+lower RMSE (3.87 vs 4.19) and higher R² (0.7957 vs 0.7608). You might think Decision Tree wins.
+But then you look at cross-validation. Cross-validation tests the model 5 different times on 5 different
+splits of the data. This gives a much fairer picture of how the model performs generally.
+Decision Tree CV R² Mean = 0.1417, Std = 0.8585. This is terrible. It means on average the model
+explains only 14% of price variation across different data splits. The standard deviation of 0.86
+means results jump wildly — sometimes it works okay, other times it completely fails. This is
+OVERFITTING — the model memorized the training data instead of learning real patterns.
+Linear Regression CV R² Mean = 0.6519, Std = 0.1620. Consistently explains 65% of price variation
+across all splits. The low standard deviation (0.16) means it performs reliably every time. LINEAR
+REGRESSION IS THE WINNER.
+What is overfitting in plain English?
+Imagine you are studying for an exam by memorizing every past paper answer word for word. You
+score 100% on past papers. But when the real exam comes with slightly different questions, you fail
+because you memorized answers instead of understanding the subject. That is what the Decision
+Tree did — it memorized the training houses instead of learning the real relationship between
+features and price.
+Residual Plots (residual_plots.png)
+A residual is the difference between what the model predicted and the actual price. A good model has
+residuals scattered randomly around zero — no pattern. If you see a pattern (curve, funnel shape),
+the model is missing something systematic. Linear Regression residuals should look more randomly
+
+
+===== PAGE 9 =====
+scattered than Decision Tree.
+
+
+===== PAGE 10 =====
+PART F — Presentation & Reflection (10 Marks)
+Summary of key findings
+1. The dataset has 506 houses, 14 features, and 6 columns had missing values filled with median.
+2. House prices average $22,530 with a slight right skew — a few very expensive houses pull the
+mean up.
+3. The strongest predictors of price are LSTAT (poverty, -0.72) and RM (rooms, +0.70).
+4. Feature engineering created LSTAT_PTRATIO which had -0.74 correlation — stronger than any
+original feature.
+5. Decision Tree appeared better on test set but was completely overfitting.
+6. Linear Regression is the better model — consistent, reliable, generalizes to new data.
+Limitations of the dataset
+The Boston Housing Dataset was collected in the 1970s. Housing markets have changed enormously
+since then — property values, crime patterns, school systems, and urban development are all
+different. Any model trained on this data cannot reliably predict modern house prices.
+With only 506 rows, the dataset is small by modern machine learning standards. Small datasets
+increase the risk of overfitting and make cross-validation results less stable.
+Suggested improvements
+1. Use Ridge or Lasso Regression instead of plain Linear Regression. These add a penalty for overly
+complex models, which helps prevent overfitting and often improves performance on new data.
+2. Tune the Decision Tree using the max_depth parameter. Instead of letting the tree grow as deep
+as it wants (which causes memorization), limit it to 4-6 levels. This forces it to learn general patterns
+rather than specific training cases.
+
+
+===== PAGE 11 =====
+What to Say When Presenting to the Class
+You do not need to explain every line of code. The lecturer wants to see that you understand what
+you did and why. Here is a script you can follow:
+Opening (30 seconds):
+"Our group worked on the Boston Housing dataset. The goal was to build a model that predicts
+house prices based on 13 features like crime rate, number of rooms, and school quality. We went
+through the full pipeline: preprocessing, EDA, feature engineering, modeling, and evaluation."
+Part A (30 seconds):
+"The dataset had 506 rows and 14 columns. Six features had 20 missing values each, which we
+filled using median imputation — we chose median over mean because housing data has outliers
+that skew the mean. We then standardized all features using StandardScaler so no feature
+dominates due to scale differences."
+Part B (45 seconds):
+"In EDA, we found that house prices average $22,530 with a slight right skew. The strongest
+correlations with price were LSTAT at -0.72 — meaning more poverty means lower prices — and
+RM at +0.70, meaning more rooms means higher prices. We identified 40 outliers using the IQR
+method."
+Part C (30 seconds):
+"For feature engineering, we created four new features. The most effective was LSTAT_PTRATIO
+— multiplying poverty level by pupil-teacher ratio. It achieved a correlation of -0.74 with house price,
+which is stronger than any single original feature. This shows that combining related features can
+improve predictive power."
+Parts D & E — The main finding (1 minute):
+"We trained Linear Regression and a Decision Tree. On the test set, Decision Tree looked better
+with an R² of 0.7957 compared to 0.7608 for Linear Regression. However, cross-validation told a
+completely different story. The Decision Tree had a cross-validation R² of only 0.14 with a standard
+deviation of 0.86 — meaning it was overfitting badly. It memorized the training data instead of
+learning real patterns. Linear Regression had a cross-validation R² of 0.65 with a standard deviation
+of only 0.16 — consistent and reliable. Our conclusion is that Linear Regression is the better model
+for this dataset."
+If they ask what overfitting means:
+"Overfitting is when a model learns the training data too specifically — including its noise and
+outliers — rather than the underlying patterns. It performs well on training data but poorly on new,
+unseen data. The Decision Tree is a good example of this here."
+
+
+===== PAGE 12 =====
+Closing:
+"The main limitation of this dataset is that it is from the 1970s, so the predictions are not relevant to
+modern housing markets. For improvements, we would suggest using Ridge Regression to reduce
+overfitting, and tuning the Decision Tree depth to prevent it from memorizing the training set."
+
+
+===== PAGE 13 =====
+Quick Code Reference — What Each Import Does
+Import
+What it does
+import pandas as pd
+Loads and manipulates the dataset (the CSV file)
+import numpy as np
+Mathematical operations (log, sqrt, arrays)
+import matplotlib.pyplot as plt
+Draws all the plots and graphs
+import seaborn as sns
+Draws the correlation heatmap (prettier plots)
+from sklearn.preprocessing import StandardScaler
+Scales features to equal range
+from sklearn.model_selection import train_test_split
+Splits data into 80% train / 20% test
+from sklearn.model_selection import cross_val_score
+Tests model stability across 5 splits
+from sklearn.linear_model import LinearRegression
+The Linear Regression model
+from sklearn.tree import DecisionTreeRegressor
+The Decision Tree model
+from sklearn.metrics import mean_squared_error
+Calculates RMSE
+from sklearn.metrics import mean_absolute_error
+Calculates MAE
+from sklearn.metrics import r2_score
+Calculates R-squared
+ You ran the code, you got the outputs, and now you understand what all of it
+ means. You are ready.
